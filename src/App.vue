@@ -1,7 +1,11 @@
 <template>
-  <div id="app">
-    <product-list />
-  </div>
+  <v-app>
+    <v-main>
+      <v-container>
+        <product-list />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script>

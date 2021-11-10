@@ -1,58 +1,86 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <v-card>
+    <v-card-title>Inventory</v-card-title>
+    <v-card-text>
+      <v-data-table
+        :headers="headers"
+        :items="filteredProducts"
+        item-key="name"
+        :search="search"
+        hide-default-footer
+      >
+        <template v-slot:top>
+          <v-text-field
+            v-model="search"
+            outlined
+            dense
+            append-icon="mdi-magnify"
+            label="Search"
+          ></v-text-field>
+        </template>
+        <template v-slot:item.quantity="{ item }">
+          <v-text-field
+            v-model="item.quantity"
+            type="number"
+            outlined
+            dense
+            hide-details
+            placeholder="Quantity"
+          >
+          </v-text-field>
+        </template>
+        <template v-slot:item.product="{ item }">
+          <span class="success--text font-weight-bold">{{ item.product }}</span>
+        </template>
+      </v-data-table>
+    </v-card-text>
+  </v-card>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
+  name: 'ProductList',
+  data() {
+    return {
+      search: '',
+      headers: [
+        {
+          text: 'Item code',
+          value: 'code'
+        },{
+          text: 'Product',
+          value: 'product'
+        },{
+          text: 'Package',
+          value: 'package'
+        },{
+          text: 'Available units',
+          value: 'units'
+        },{
+          text: 'Category',
+          value: 'category'
+        },{
+          text: 'Last updated',
+          value: 'lastUpdated'
+        },{
+          text: 'Edit available quantity',
+          value: 'quantity'
+        }
+      ]
+    }
+  },
+  computed: {
+    ...mapState('products', ['products']),
+    filteredProducts() {
+      return this.products.filter((product) => {
+        const upperSearch = this.search.toUpperCase()
+
+        return product.code.toUpperCase().includes(upperSearch) ||
+          product.product.toUpperCase().includes(upperSearch) ||
+          product.category.toUpperCase().includes(upperSearch)
+      })
+    }
   }
 }
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
